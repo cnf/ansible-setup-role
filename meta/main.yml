@@ -11,14 +11,21 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions: 
-        - all
+        - trusty
+        - xenial
+        - zesty
     - name: Debian
       versions:
+        - 8
+        - 9
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: opensuse
+      versions:
         - all 
-    - name: RedHat
+    - name: SLES
       versions:
         - all
-    - name: Suse
-      versions:
-        - all 
 dependencies: []
