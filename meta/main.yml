@@ -16,8 +16,8 @@ galaxy_info:
         - zesty
     - name: Debian
       versions:
-        - 8
-        - 9
+        - stretch
+        - jessie
     - name: EL
       versions:
         - 6
