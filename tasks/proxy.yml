@@ -1,0 +1,57 @@
+---
+# - name: "Set proxy in /etc/environment"
+
+- name: Configure proxy in /etc/profile.d/proxy.sh
+  become: true
+  template:
+    src: profile_proxy.sh.j2
+    dest: /etc/profile.d/proxy.sh
+  tags: proxy
+
+- name: Configure proxy for apt
+  become: true
+  template:
+    src: apt_proxy.j2
+    dest: /etc/apt/apt.conf.d/80proxy
+  tags: proxy
+  when: ansible_os_family == 'Debian'
+
+- set_fact:
+    yum_proxy: "{{ http_proxy }}"
+  when:
+    - ansible_os_family == 'RedHat'
+    - yum_proxy is not defined
+    - http_proxy is defined
+
+- name: Configure proxy for yum
+  become: true
+  lineinfile:
+    dest: /etc/yum.conf
+    regexp: '^proxy'
+    line: "proxy={{ yum_proxy }}"
+  tags: proxy
+  when: 
+    - ansible_os_family == 'RedHat'
+    - yum_proxy is defined
+
+- name: Configure proxy_username for yum
+  become: true
+  lineinfile: 
+    dest: /etc/yum.conf
+    regexp: '^proxy_username'
+    line: "proxy_username={{ proxy_settings_yum_proxy_username }}"
+  tags: proxy
+  when: 
+    - ansible_os_family == 'RedHat'
+    - yum_proxy_username is defined
+
+- name: Configure proxy_password for yum
+  become: true
+  lineinfile: 
+    dest: /etc/yum.conf
+    regexp: '^proxy_password'
+    line: "proxy_password={{ yum_proxy_password }}"
+  tags: proxy
+  when: 
+    - ansible_os_family == 'RedHat'
+    - yum_proxy_password is defined

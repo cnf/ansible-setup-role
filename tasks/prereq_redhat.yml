@@ -1,0 +1,6 @@
+---
+- name: "Make sure epel is installed"
+  become: true
+  package:
+    name: epel-release
+    state: present

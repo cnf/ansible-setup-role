@@ -1,0 +1,21 @@
+---
+- name: "Update apt repo cache"
+  become: true
+  apt:
+    update_cache: True
+    cache_valid_time: 86400
+  tags: packages
+  when: ansible_pkg_mgr == 'apt'
+
+- name: Install software
+  become: true
+  package:
+    name: "{{item}}"
+    state: installed
+  tags: packages
+  with_items:
+  - vim
+  - tree
+  - htop
+  - rsync
+  - "{{ pip_package }}"

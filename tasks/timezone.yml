@@ -1,0 +1,5 @@
+---
+- name: "set the timezone to {{host_timezone|default('UTC')}}"
+  become: true
+  timezone:
+    name: "{{host_timezone|default('UTC')}}"

@@ -1,0 +1,65 @@
+---
+- name: Install libselinux-python
+  become: true
+  package:
+    name: libselinux-python
+    state: present
+  when: 
+    - ansible_os_family|lower == 'redhat'
+    - ansible_selinux is defined
+    - "'status' in ansible_selinux"
+    - ansible_selinux.status == 'enabled'
+  tags: 
+    - ntp
+    - selinux
+
+- name: Install ntpd
+  become: true
+  package:
+    name: "{{ ntpd_package }}"
+    state: installed
+  tags: 
+    - ntp
+
+- name: Create ntpd_script_dir
+  become: true
+  file:
+    path: "{{ ntpd_script_dir }}"
+    state: directory
+
+- name: Create ansible-ntpd-checkconfig
+  become: true
+  copy:
+    dest: "{{ ntpd_script_dir }}/ansible-ntpd-checkconfig"
+    src: ansible-ntpd-checkconfig.sh
+    mode: 0755
+
+- name: Register ntpd version
+  command: ntpd --version
+  register: register_ntpd_version
+  changed_when: false
+  always_run: yes
+
+- name: Set ntpd_supports_pool
+  set_fact:
+    ntpd_supports_pool: "{{ register_ntpd_version.stdout.split()[1] | version_compare('4.2.7', '>=') }}"
+
+- name: Download leap seconds file
+  become: true
+  get_url:
+    url: "{{ ntpd_leap_seconds_url }}"
+    dest: "{{ ntpd_db_dir }}/leap-seconds.list"
+    force: yes
+  register: register_ntpd_leapfile
+  when:
+    - ntpd_leap_seconds_url is defined
+    - ntpd_leap_seconds_url | length > 0
+
+- name: Create ntpd.conf
+  become: true
+  template:
+    src: ntpd.conf.client.j2
+    dest: "{{ ntpd_conf }}"
+    # TODO: APPARMOR blocks this.
+    # validate: "{{ ntpd_script_dir }}/ansible-ntpd-checkconfig %s"
+  notify: Restart ntpd

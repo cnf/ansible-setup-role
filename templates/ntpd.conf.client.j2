@@ -1,0 +1,43 @@
+# {{ ansible_managed }}
+
+# Enable this if you want statistics to be logged.
+#statsdir /var/log/ntpstats/
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+{% for s in ntpd_upstreams %}
+server {{ s }} iburst
+restrict {{ s }} nomodify notrap noquery
+{% endfor %}
+
+{% if ( ntpd_pools | length == 0 ) or ntpd_supports_pool %}
+restrict default ignore
+restrict -6 default ignore
+{% else %}
+restrict -4 default kod notrap nomodify nopeer noquery limited
+restrict -6 default kod notrap nomodify nopeer noquery limited
+{% endif %}
+
+{% if ( ntpd_pools | length > 0 ) %}
+{% if ntpd_supports_pool %}
+{% for ntpd_pool in ntpd_pools %}
+pool {{ ntpd_pool }} iburst
+{% endfor %}
+# Needed for adding pool entries
+restrict source nomodify noquery notrap
+{% else %}
+{% for ntpd_pool in ntpd_pools %}
+server {{ ntpd_pool }} iburst
+{% endfor %}
+{% endif %}
+{% endif %}
+
+restrict localhost
+restrict -6 ::1
+
+{% if register_ntpd_leapfile %}
+leapfile "{{ ntpd_db_dir }}/leap-seconds.list"
+{% endif %}
+driftfile "{{ ntpd_db_dir }}/ntp.drift"

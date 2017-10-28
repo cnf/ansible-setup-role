@@ -1,0 +1,17 @@
+---
+- name: set sysctl settings
+  become: true
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    reload: true
+    state: "{{ item.state | default('present') }}"
+  with_flattened:
+    - "{{ sysctl_settings }}"
+    - "{{ sysctl_group_settings }}"
+    - "{{ sysctl_host_settings }}"
+  # tags:
+  #   - configuration
+  #   - sysctl
+  #   - sysctl-settings
+  # skip: True

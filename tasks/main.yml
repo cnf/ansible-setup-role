@@ -1,0 +1,30 @@
+---
+- name: "Include distro-specific variables"
+  include_vars: "{{ item }}"
+  with_first_found:
+   - "{{ ansible_distribution }}.yml"
+   - "{{ ansible_os_family }}.yml"
+   - "default.yml"
+
+- include_tasks: proxy.yml
+
+- name: "Include distro-specific prerequisites"
+  include_tasks: "{{item}}"
+  with_first_found:
+  - files:
+    - "prereq_{{ansible_distribution|lower}}.yml"
+    - "prereq_{{ansible_os_family|lower}}.yml"
+    paths:
+    - "{{role_path}}/tasks"
+    skip: True
+
+- include_tasks: hostname.yml
+- include_tasks: timezone.yml
+- include_tasks: sysctl.yml
+- include_tasks: basicpackages.yml
+- include_tasks: ntp.yml
+- include_tasks: vmwaretools.yml
+  tags: vmwaretools
+  when: ansible_virtualization_type is defined and ansible_virtualization_type|lower == 'vmware' and ansible_virtualization_role|lower == 'guest'
+
+## TODO: DNS, Users, ssh keys, groups

@@ -1,0 +1,31 @@
+---
+#host_timezone: 'Europe/Brussels'
+
+#sysctl_settings:
+#  - name: net.ipv4.tcp_fin_timeout
+#    value: 10
+sysctl_settings: []
+sysctl_group_settings: []
+sysctl_host_settings: []
+
+#cfg_hostname: "myhostname"
+
+## NTP
+ntpd_service: "{{ __ntpd_service }}"
+ntpd_conf: "{{ __ntpd_conf }}"
+ntpd_db_dir: "{{ __ntpd_db_dir }}"
+ntpd_script_dir: "{{ __ntpd_script_dir }}"
+ntpd_package: "{{ __ntpd_package }}"
+ntpd_leap_seconds_url: "https://www.ietf.org/timezones/data/leap-seconds.list"
+
+ntpd_upstreams: []
+ntpd_pools: [ '0.pool.ntp.org', '1.pool.ntp.org', '2.pool.ntp.org', '3.pool.ntp.org' ]
+
+## PROXY
+# http_proxy:
+# https_proxy:
+# ftp_proxy:
+# no_proxy:
+# yum_proxy:
+# yum_proxy_username
+# yum_proxy_password

@@ -1,0 +1,16 @@
+---
+# TODO: Install the vmware tools
+
+#- debug: var=ansible_virtualization_type
+
+- name: Check if vmware tools are installed
+  stat:
+    path: /etc/vmware-tools
+  register: vmwaretools_dir
+
+- name: Install open-vm-tools
+  become: true
+  package:
+    name: open-vm-tools
+    state: present
+  when: vmwaretools_dir is defined and not (vmwaretools_dir.stat.isdir is defined and vmwaretools_dir.stat.isdir)

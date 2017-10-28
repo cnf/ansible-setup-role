@@ -1,0 +1,13 @@
+---
+## TODO: hostname / FQDN scheme?
+- name: "Set the hostname if needed"
+  hostname: name={{cfg_hostname}}
+  when: cfg_hostname is defined
+
+- name: "update hostname in /etc/hosts"
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: '^127\.0\.([0-9]+)\.1(\s+).*$'
+    line: "127.0.0.1	{{cfg_hostname}} localhost"
+    backup: True
+  when: cfg_hostname is defined

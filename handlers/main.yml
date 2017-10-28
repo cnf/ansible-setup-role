@@ -1,0 +1,11 @@
+---
+- name: update timezone dpkg
+  become: true
+  command: dpkg-reconfigure --frontend noninteractive tzdata
+  when: ansible_pkg_mgr == 'apt'
+
+- name: Restart ntpd
+  become: true
+  service:
+    name: "{{ ntpd_service }}"
+    state: restarted
