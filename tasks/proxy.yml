@@ -16,7 +16,8 @@
   tags: proxy
   when: ansible_os_family == 'Debian'
 
-- set_fact:
+- name: "Get yum proxy"
+  set_fact:
     yum_proxy: "{{ http_proxy }}"
   when:
     - ansible_os_family == 'RedHat'
