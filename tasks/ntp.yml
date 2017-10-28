@@ -38,7 +38,7 @@
   command: ntpd --version
   register: register_ntpd_version
   changed_when: false
-  always_run: yes
+  check_mode: no
 
 - name: Set ntpd_supports_pool
   set_fact:
